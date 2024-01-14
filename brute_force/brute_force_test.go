@@ -112,3 +112,51 @@ func TestKnnHarder(t *testing.T) {
 		})
 	}
 }
+
+func TestInRange(t *testing.T) {
+	testCases := []struct {
+		desc     string
+		inx      []float64
+		iny      []float64
+		qx       float64
+		qy       float64
+		r        float64
+		wantinds []int
+	}{
+		{
+			desc:     "n=10,r=3.14",
+			inx:      []float64{2.76964, 1.72057, 4.50333, 1.41612, 3.34827, 1.71495, 3.10408, 4.34419, 2.66255, 0.826588},
+			iny:      []float64{0.515162, 3.61385, 3.80529, 2.38902, 3.51642, 1.54887, 0.577434, 3.86879, 1.75372, 1.12639},
+			qx:       5.0,
+			qy:       5.0,
+			r:        3.14,
+			wantinds: []int{2, 4, 7},
+		},
+		{
+			desc:     "n=10,r=5",
+			inx:      []float64{2.76964, 1.72057, 4.50333, 1.41612, 3.34827, 1.71495, 3.10408, 4.34419, 2.66255, 0.826588},
+			iny:      []float64{0.515162, 3.61385, 3.80529, 2.38902, 3.51642, 1.54887, 0.577434, 3.86879, 1.75372, 1.12639},
+			qx:       1.0,
+			qy:       1.0,
+			r:        5.0,
+			wantinds: []int{0, 1, 2, 3, 4, 5, 6, 7, 8, 9},
+		},
+		{
+			desc:     "n=10,r=1",
+			inx:      []float64{2.76964, 1.72057, 4.50333, 1.41612, 3.34827, 1.71495, 3.10408, 4.34419, 2.66255, 0.826588},
+			iny:      []float64{0.515162, 3.61385, 3.80529, 2.38902, 3.51642, 1.54887, 0.577434, 3.86879, 1.75372, 1.12639},
+			qx:       2.5,
+			qy:       2.5,
+			r:        1.0,
+			wantinds: []int{8},
+		},
+	}
+	for _, tC := range testCases {
+		t.Run(tC.desc, func(t *testing.T) {
+			tree, _ := brute_force.NewBruteTree(tC.inx, tC.iny)
+			indices := tree.InRange(tC.qx, tC.qy, tC.r)
+
+			assert.ElementsMatch(t, tC.wantinds, indices)
+		})
+	}
+}
